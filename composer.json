@@ -1,0 +1,21 @@
+{
+    "name": "laurism/pdfobject",
+    "description": "Yii2 extension for the PDFObject -  A lightweight JavaScript utility for dynamically embedding PDFs in HTML documents. http://pdfobject.com/",
+    "type": "yii2-extension",
+    "keywords": ["yii2","extension"," pdf"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Lauris Mierkalns",
+            "email": "latpages@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "laurism\\pdfobject\\": ""
+        }
+    }
+}
