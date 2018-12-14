@@ -1,7 +1,7 @@
 <?php
-namespace laurism\pdfobject\widgets;
+namespace d3yii2\pdfobject\widgets;
 
-use laurism\pdfobject\PDFObjectAsset;
+use d3yii2\pdfobject\PDFObjectAsset;
 use yii\helpers\Json;
 
 /**
@@ -68,7 +68,7 @@ class PDFObject extends \yii\base\Widget
         return $script;
     }
     
-    public function getOptions()
+    public function getOptions(): string
     {
         $defaultOptions = [
             'pdfOpenParams' => [
@@ -79,8 +79,8 @@ class PDFObject extends \yii\base\Widget
             ]
         ];
 
-        $options = Json::encode(array_merge($defaultOptions, $this->pdfOptions));
-        
-        return $options;
+        return Json::encode(array_merge($defaultOptions, $this->pdfOptions));
+
+
     }
 }

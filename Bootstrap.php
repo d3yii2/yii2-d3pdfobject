@@ -1,10 +1,8 @@
 <?php
 
-namespace laurism\pdfobject;
+namespace d3yii2\pdfobject;
 
-use Yii;
 use yii\base\BootstrapInterface;
-use yii\i18n\PhpMessageSource;
 
 class Bootstrap implements BootstrapInterface {
 

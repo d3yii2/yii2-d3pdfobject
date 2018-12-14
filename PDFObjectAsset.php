@@ -1,11 +1,11 @@
 <?php
-namespace laurism\pdfobject;
+namespace d3yii2\pdfobject;
 
 use yii\web\AssetBundle;
 
 class PDFObjectAsset extends AssetBundle
 {
-    public $sourcePath = '@vendor/laurism/pdfobject/assets';
+    public $sourcePath = '@vendor/d3yii2/pdfobject/assets';
     public $basePath = '@webroot';
     public $css = [
         'css/pdfobject-custom.css',
