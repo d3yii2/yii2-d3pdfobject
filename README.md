@@ -10,13 +10,13 @@ The preferred way to install this extension is through [composer](http://getcomp
 Either run
 
 ```
-php composer.phar require --prefer-dist laurism/pdfobject "*"
+php composer.phar require --prefer-dist d3yii2/pdfobject "*"
 ```
 
 or add
 
 ```
-"laurism/pdfobject": "*"
+"d3yii2/pdfobject": "*"
 ```
 
 to the require section of your `composer.json` file.
@@ -28,5 +28,5 @@ Usage
 Once the extension is installed, simply use it in your code by  :
 
 ```php
-<?= \laurism\pdfobject\PDFObject::widget(); ?>
+<?= \d3yii2\pdfobject\PDFObject::widget(); ?>
 ```

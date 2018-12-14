@@ -1,5 +1,5 @@
 {
-    "name": "laurism/pdfobject",
+    "name": "d3yii2/pdfobject",
     "description": "Yii2 extension for the PDFObject -  A lightweight JavaScript utility for dynamically embedding PDFs in HTML documents. http://pdfobject.com/",
     "type": "yii2-extension",
     "keywords": ["yii2","extension"," pdf"],
@@ -15,7 +15,7 @@
     },
     "autoload": {
         "psr-4": {
-            "laurism\\pdfobject\\": ""
+            "d3yii2\\pdfobject\\": ""
         }
     }
 }
