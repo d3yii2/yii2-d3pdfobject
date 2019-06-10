@@ -16,7 +16,7 @@ class PDFObject extends \yii\base\Widget
     public $listenElement;
     public $targetElement;
     public $listenEvent;
-    public $closeButtonOptions;
+    public $closeButtonOptions = [];
     
     public function init() {
         parent::init();
@@ -40,12 +40,6 @@ class PDFObject extends \yii\base\Widget
         ];
         
         $buttonOptions = array_merge($defaultButtonOptions, $this->closeButtonOptions);
-        ?>
-        <div class="collapse" class="embed-pdf">
-            <?= \yii\bootstrap\Button::widget($buttonOptions) ?>
-            <div class="embed-pdf-content card card-body"></div>
-        </div>
-        <?php
     }
     
     public function registerScript($js)
