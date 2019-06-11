@@ -13,33 +13,41 @@ use yii\helpers\Json;
 class PDFObject extends \yii\base\Widget
 {
     public $pdfOptions = [];
-    public $listenElement;
-    public $targetElement;
-    public $listenEvent;
+    public $targetElementClass = self::TARGET_ELEMENT_DEFAULT;
+    public $listenEvents = [self::LISTEN_ELEMENT_DEFAULT => self::LISTEN_EVENT_CLICK];
+    public $renderCollapsible = true;
     public $closeButtonOptions = [];
-    
+
+    const LISTEN_ELEMENT_DEFAULT = '[data-embed-pdf]';
+    const TARGET_ELEMENT_DEFAULT = 'embed-pdf-content';
+    const LISTEN_EVENT_CLICK = 'click';
+    const LISTEN_EVENT_CHANGE = 'change';
+
     public function init() {
         parent::init();
         PDFObjectAsset::register( $this->getView() );
 
-        // By default PDF will be loaded into container having id: embed-pdf
-        $this->targetElement = '.embed-pdf-content';
-
-        $this->listenEvent = 'onclick';
-        
         $script = $this->getListenerScript();
-        
+
         $this->registerScript($script);
     }
-    
+
     public function run()
-    { 
+    {
         $defaultButtonOptions = [
             'label' => 'Close',
             'options' => ['class' => 'embed-pdf-close-button btn-md btn-primary pull-right'],
         ];
-        
+
         $buttonOptions = array_merge($defaultButtonOptions, $this->closeButtonOptions);
+
+        if ($this->renderCollapsible): ?>
+            <div class="collapse" class="embed-pdf">
+                <?= \yii\bootstrap\Button::widget($buttonOptions) ?>
+                <div class="<?= self::TARGET_ELEMENT_DEFAULT ?> card card-body"></div>
+            </div>
+        <?php
+        endif;
     }
     
     public function registerScript($js)
@@ -49,14 +57,19 @@ class PDFObject extends \yii\base\Widget
     
     public function getListenerScript()
     {
-        $listenElement = addslashes($this->listenElement);
-        $targetElement = addslashes($this->targetElement);
+        $script = '';
 
-        switch ($this->listenEvent) {
-            case 'onclick':
-                $script  = 'listenOnClick("'
-                    . $listenElement . '", "' . $targetElement . '", ' . $this->getOptions()
+        foreach($this->listenEvents as $selector => $event) {
+            $listen  = 'listenOn' . ucfirst($event) . '("'
+                    . addslashes($selector) . '", ".' . addslashes($this->targetElementClass) . '", ' . $this->getOptions()
                     . ');';
+
+            // Reinitialize events after pajax call
+            $script .= $listen . " 
+                $(document).on('pjax:success', function() {
+                   $listen
+                });
+            ";
         }
         
         return $script;
