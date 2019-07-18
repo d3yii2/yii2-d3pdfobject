@@ -14,7 +14,7 @@ class PDFObject extends \yii\base\Widget
 {
     public $pdfOptions = [];
     public $targetElementClass = self::TARGET_ELEMENT_DEFAULT;
-    public $listenEvents = [self::LISTEN_ELEMENT_DEFAULT => self::LISTEN_EVENT_CLICK];
+    public $listenEvents = [];
     public $renderCollapsible = true;
     public $closeButtonOptions = [];
 
@@ -25,6 +25,11 @@ class PDFObject extends \yii\base\Widget
 
     public function init() {
         parent::init();
+
+        $defaultListenEvents = [self::LISTEN_ELEMENT_DEFAULT => self::LISTEN_EVENT_CLICK];
+
+        $this->listenEvents = array_merge($defaultListenEvents, $this->listenEvents);
+
         PDFObjectAsset::register( $this->getView() );
 
         $script = $this->getListenerScript();
