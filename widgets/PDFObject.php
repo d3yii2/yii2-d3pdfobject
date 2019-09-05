@@ -1,7 +1,9 @@
 <?php
+
 namespace d3yii2\pdfobject\widgets;
 
 use d3yii2\pdfobject\PDFObjectAsset;
+use yii\helpers\Html;
 use yii\helpers\Json;
 
 /**
@@ -9,90 +11,136 @@ use yii\helpers\Json;
  * PDFObject is a lightweight JavaScript utility for dynamically embedding PDFs in HTML documents.
  * Homepage: http://pdfobject.com/
  * Github: https://github.com/pipwerks/PDFObject/
+ * @var array $pdfOptions
+ * @var string $targetElementClass
+ * @var array $listenEvents
+ * @var boolean $renderLayout
+ * @var array $closeButtonOptions
+ * @var array $wrapperHtmlOptions
+ * @var array $headerHtmlOptions
+ * @var bool $showCloseButton
+ * @var string LAYOUT_PREFIX
+ * @var string LOAD_BUTTON_CLASS
+ * @var string CONTENT_CLASS
+ * @var string LISTEN_ON_CLICK
+ * @var string LISTEN_ON_CHANGE
  */
 class PDFObject extends \yii\base\Widget
 {
     public $pdfOptions = [];
-    public $targetElementClass = self::TARGET_ELEMENT_DEFAULT;
+    public $targetElementClass = self::CONTENT_CLASS;
     public $listenEvents = [];
-    public $renderCollapsible = true;
+    public $renderLayout = true;
     public $closeButtonOptions = [];
+    public $wrapperHtmlOptions = [];
+    public $headerHtmlOptions = [];
+    public $showCloseButton = true;
 
-    const LISTEN_ELEMENT_DEFAULT = '[data-embed-pdf]';
-    const TARGET_ELEMENT_DEFAULT = 'embed-pdf-content';
-    const LISTEN_EVENT_CLICK = 'click';
-    const LISTEN_EVENT_CHANGE = 'change';
+    const LAYOUT_PREFIX = 'pdfobject';
+    const LOAD_BUTTON_CLASS = self::LAYOUT_PREFIX . '-load-button';
+    const CONTENT_CLASS = self::LAYOUT_PREFIX . '-embed';
+    const LISTEN_ON_CLICK = 'click';
+    const LISTEN_ON_CHANGE = 'change';
 
-    public function init() {
+    /**
+     * Set the default options and register the scripts
+     */
+    public function init(): void
+    {
         parent::init();
 
-        $defaultListenEvents = [self::LISTEN_ELEMENT_DEFAULT => self::LISTEN_EVENT_CLICK];
+        $this->listenEvents = array_merge(
+            ['.' . self::LOAD_BUTTON_CLASS => self::LISTEN_ON_CLICK],
+            $this->listenEvents
+        );
 
-        $this->listenEvents = array_merge($defaultListenEvents, $this->listenEvents);
+        $this->wrapperHtmlOptions = array_merge(['style' => 'height: 100%'], $this->wrapperHtmlOptions);
 
-        PDFObjectAsset::register( $this->getView() );
+        $this->closeButtonOptions = array_merge(
+            [
+                'label' => 'Close',
+                'options' => ['class' => '' . self::LAYOUT_PREFIX . '-close-button btn-md btn-primary pull-right'],
+            ],
+            $this->closeButtonOptions
+        );
 
-        $script = $this->getListenerScript();
+        $this->pdfOptions = array_merge(
+            [
+                'pdfOpenParams' => [
+                        'navpanes' => 0,
+                        'toolbar' => 0,
+                        'statusbar' => 0,
+                        'view' => 'FitH',
+                ]
+            ],
+            $this->pdfOptions
+        );
+
+        PDFObjectAsset::register($this->getView());
+
+        $script = $this->getInlineScripts();
 
         $this->registerScript($script);
     }
 
-    public function run()
+    /**
+     * @return string
+     * @throws \Exception
+     */
+    public function run(): string
     {
-        $defaultButtonOptions = [
-            'label' => 'Close',
-            'options' => ['class' => 'embed-pdf-close-button btn-md btn-primary pull-right'],
-        ];
+        $content = '';
 
-        $buttonOptions = array_merge($defaultButtonOptions, $this->closeButtonOptions);
+        if ($this->renderLayout) {
+            $content .= '
+            <div class="' . self::LAYOUT_PREFIX . '-wrapper" ' . Html::renderTagAttributes($this->wrapperHtmlOptions) . '>
+                <div class="' . self::LAYOUT_PREFIX . '-header" ' . Html::renderTagAttributes($this->headerHtmlOptions) . '>';
+            if ($this->showCloseButton) {
+                $content .= \yii\bootstrap\Button::widget($this->closeButtonOptions);
+            }
+            $content .= '
+                   </div>
+                <div class="' . self::CONTENT_CLASS . '"></div>
+            </div>';
+        }
 
-        if ($this->renderCollapsible): ?>
-            <div class="collapse" class="embed-pdf">
-                <?= \yii\bootstrap\Button::widget($buttonOptions) ?>
-                <div class="<?= self::TARGET_ELEMENT_DEFAULT ?> card card-body"></div>
-            </div>
-        <?php
-        endif;
+        return $content;
     }
-    
-    public function registerScript($js)
-    {
-        $this->view->registerJs($js . ';', $this->view::POS_END);
-    }
-    
-    public function getListenerScript()
-    {
-        $script = '';
 
-        foreach($this->listenEvents as $selector => $event) {
-            $listen  = 'listenOn' . ucfirst($event) . '("'
-                    . addslashes($selector) . '", ".' . addslashes($this->targetElementClass) . '", ' . $this->getOptions()
-                    . ');';
+    /**
+     * Register inline Javascripts
+     * @param string $js
+     */
+    public function registerScript(string $js): void
+    {
+        $this->view->registerJs($js . ';', $this->view::POS_READY);
+    }
+
+    /**
+     * Get the content of inline scripts
+     * @return string
+     */
+    public function getInlineScripts(): string
+    {
+        $options = Json::encode([
+            'contentTarget' => '.' . $this->targetElementClass,
+            'pdfOptions' => Json::encode($this->pdfOptions),
+        ]);
+
+        $script = 'D3PDF = new D3PDFObject(' . $options . ');D3PDF.initHandlers();';
+
+        foreach ($this->listenEvents as $selector => $event) {
+            $listen = 'D3PDF.listenOn' . ucfirst($event) . '("'
+                . addslashes($selector) . '");';
 
             // Reinitialize events after pajax call
             $script .= $listen . " 
-                $(document).on('pjax:success', function() {
+                jQuery(document).on('pjax:success', function() {
                    $listen
                 });
             ";
         }
-        
+
         return $script;
-    }
-    
-    public function getOptions(): string
-    {
-        $defaultOptions = [
-            'pdfOpenParams' => [
-                'navpanes' => 0,
-                'toolbar' => 0,
-                'statusbar' => 0,
-                'view' => 'FitH',
-            ]
-        ];
-
-        return Json::encode(array_merge($defaultOptions, $this->pdfOptions));
-
-
     }
 }
