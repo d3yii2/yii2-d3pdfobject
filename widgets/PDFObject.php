@@ -92,7 +92,15 @@ class PDFObject extends \yii\base\Widget
         $content = '';
 
         if ($this->renderLayout) {
-            $content .= '
+            $content = $this->getLayout();
+        }
+
+        return $content;
+    }
+
+    public function getLayout()
+    {
+        $content = '
             <div class="' . self::LAYOUT_PREFIX . '-wrapper" ' . Html::renderTagAttributes($this->wrapperHtmlOptions) . '>
                 <div class="' . self::LAYOUT_PREFIX . '-header" ' . Html::renderTagAttributes($this->headerHtmlOptions) . '>';
             if ($this->showCloseButton) {
@@ -100,11 +108,10 @@ class PDFObject extends \yii\base\Widget
             }
             $content .= '
                    </div>
-                <div class="' . self::CONTENT_CLASS . '"></div>
+                <div class="' . $this->targetElementClass . '"></div>
             </div>';
-        }
 
-        return $content;
+         return $content;
     }
 
     /**
