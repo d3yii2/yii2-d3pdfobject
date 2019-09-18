@@ -1,3 +1,6 @@
-.pdfobject-embed.pdfobject-container {
+.pdfobject-container {
     height: 100%;
+}
+.pdfobject-wrapper {
+    display: none;
 }
