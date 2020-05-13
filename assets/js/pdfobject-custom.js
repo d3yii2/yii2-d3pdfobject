@@ -14,6 +14,7 @@ var D3PDFObject = function(options){
             closeButton: $('.pdfobject-close-button')
         };
     this.contentTarget = null;
+    this.loadingSpinnerClass = null;
 
     /*
      * Can access this.method
@@ -36,13 +37,17 @@ var D3PDFObject = function(options){
      * Pass options when class instantiated
      */
     this.construct(options);
+
+    if (self.loadingSpinnerClass) {
+        self.domElements.spinner = $(self.loadingSpinnerClass);
+    }
 };
 
 //assigning an object literal to the prototype is a shorter syntax
 //than assigning one property at a time
 D3PDFObject.prototype = {
     embed: function(url) {
-        PDFObject.embed(url, this.contentTarget, this.pdfOptions);
+        return PDFObject.embed(url, this.contentTarget, this.pdfOptions);
     },
     setContentTarget: function(e) {
         this.contentTarget = e;
@@ -77,10 +82,14 @@ D3PDFObject.prototype = {
             return false;
         }
 
+        if (this.domElements.spinner) {
+            this.domElements.spinner.show();
+        }
         this.domElements.wrapper.show();
 
-        //this.domElements.embed.html('<div class=\'spinner\'><div class=\'mask\'></div><div id=\'loader\'></div></div>');
-        this.embed(url);
+        if (this.embed(url) && this.domElements.spinner) {
+            this.domElements.spinner.hide();
+        }
 
         if("undefined" !== typeof callback) {
             // @TODO - callback action

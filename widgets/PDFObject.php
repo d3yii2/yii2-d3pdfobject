@@ -35,6 +35,7 @@ class PDFObject extends \yii\base\Widget
     public $wrapperHtmlOptions = [];
     public $headerHtmlOptions = [];
     public $showCloseButton = true;
+    public $loadingSpinnerClass = 'spinner';
 
     const LAYOUT_PREFIX = 'pdfobject';
     const LOAD_BUTTON_CLASS = self::LAYOUT_PREFIX . '-load-button';
@@ -132,6 +133,7 @@ class PDFObject extends \yii\base\Widget
         $options = Json::encode([
             'contentTarget' => '.' . $this->targetElementClass,
             'pdfOptions' => Json::encode($this->pdfOptions),
+            'loadingSpinnerClass' => '.' . $this->loadingSpinnerClass,
         ]);
 
         $script = 'D3PDF = new D3PDFObject(' . $options . ');D3PDF.initHandlers();';
