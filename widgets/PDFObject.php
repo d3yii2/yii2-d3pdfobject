@@ -65,13 +65,13 @@ class PDFObject extends \yii\base\Widget
             $this->closeButtonOptions
         );
 
-        $this->pdfOptions = array_merge(
+        $this->pdfOptions = array_merge_recursive(
             [
                 'pdfOpenParams' => [
                         'navpanes' => 0,
                         'toolbar' => 0,
                         'statusbar' => 0,
-                        'view' => 'FitH',
+                        'view' => 'FitV',
                 ]
             ],
             $this->pdfOptions
