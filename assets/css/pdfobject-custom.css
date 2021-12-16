@@ -1,5 +1,8 @@
+.pdfobject-header {
+    height: 40px;
+}
 .pdfobject-container {
-    height: 100%;
+    height: 94%;
 }
 .pdfobject-wrapper {
     display: none;
